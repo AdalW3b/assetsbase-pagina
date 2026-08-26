@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalShell } from "@/components/LegalShell";
+import { alternatesFor } from "@/lib/metadata";
 import { contact } from "@/lib/content";
 
 /* PLANTILLA — revisar con abogado antes de publicar.
@@ -11,12 +12,13 @@ export const metadata: Metadata = {
   title: "Términos de servicio",
   description:
     "Condiciones de uso y contratación del sistema AssetBase ERP.",
+  alternates: alternatesFor("terms", "es"),
   robots: { index: true, follow: false },
 };
 
 export default function Terminos() {
   return (
-    <LegalShell title="Términos de servicio" updated="21 de agosto de 2026">
+    <LegalShell lang="es" routeKey="terms" title="Términos de servicio" updated="21 de agosto de 2026">
       <p>
         Estos términos rigen el uso de este sitio y la contratación del
         sistema AssetBase ERP. Al solicitar una demostración o contratar el

@@ -13,11 +13,17 @@ npm run dev        # http://localhost:3000
 
 ```
 app/
-  layout.tsx          fuentes, metadata, dominio canónico
-  page.tsx            orden de secciones
+  (es)/               español, servido desde la raíz
+    layout.tsx          <html lang="es-MX">, metadata
+    page.tsx            → /
+    not-found.tsx       404 con marca y salida a la demo
+    gracias/            destino del formulario cuando no hay JS
+    aviso-de-privacidad/  terminos/
+  (en)/               inglés, servido bajo /en
+    layout.tsx          <html lang="en">, metadata
+    en/page.tsx         → /en
+    en/privacy/  en/terms/  en/thank-you/
   globals.css         tokens de color, tipografía y keyframes
-  not-found.tsx       404 con marca y salida a la demo
-  gracias/            destino del formulario cuando no hay JS
   api/demo/route.ts   recepción y entrega de los leads
 components/
   Mark.tsx            el imagotipo en SVG — servidor, sin framer-motion
@@ -39,8 +45,18 @@ components/
   CookieBanner.tsx    la banda de consentimiento
   LogoStrip.tsx       prueba social
   Reveal.tsx          animación de entrada + Kicker
+  Landing.tsx         el orden de secciones, compartido por los dos idiomas
+  Shell.tsx           <html> y <body>, compartidos por los dos layouts raíz
+  LanguageToggle.tsx  el botón de idioma
+  ThanksPage.tsx      la confirmación, compartida
+  OgCard.tsx          la tarjeta de Open Graph, una por idioma
 lib/
-  content.ts          TODO el texto y los datos
+  content/es.ts       TODO el texto en español — define la forma
+  content/en.ts       la traducción, tipada contra la anterior
+  content/index.ts    getContent() y lo que no es texto
+  i18n.ts             los idiomas y el mapa de rutas equivalentes
+  metadata.ts         metadatos y etiquetas hreflang
+  fonts.ts            las fuentes, instanciadas una sola vez
   mark.ts             los trazos del imagotipo, en un solo lugar
   site.ts             el dominio canónico
   analytics.ts        consentimiento y eventos
@@ -48,7 +64,27 @@ scripts/
   google-apps-script.gs   recibe los leads en una hoja de Google
 ```
 
-**Para cambiar palabras, edita solo `lib/content.ts`.** Los componentes no llevan copy incrustado.
+**Para cambiar palabras, edita `lib/content/es.ts` y `lib/content/en.ts`.** Los componentes no llevan copy incrustado.
+
+---
+
+## Dos idiomas
+
+El español vive en la raíz y el inglés bajo `/en`. Se eligió así para no mover ninguna URL existente.
+
+**El botón de idioma es un enlace real**, no un interruptor de estado: lleva a la ruta equivalente en el otro idioma —de `/en/privacy` a `/aviso-de-privacidad`, no al inicio— así que la dirección se puede copiar y compartir, y Google indexa las dos versiones. El mapa de equivalencias está en `lib/i18n.ts`, en `routes`: **agregar una página traducida es agregar un renglón ahí**, y el botón, el sitemap y las etiquetas hreflang lo recogen solos.
+
+**`en.ts` está tipado como `typeof es`.** Si agregas una llave en español y no en inglés, el build falla. Es a propósito: una traducción a medias en producción es peor que un error de compilación.
+
+**Hay dos layouts raíz**, `(es)` y `(en)`, porque el atributo `lang` de `<html>` solo puede fijarse en un layout raíz y tiene que ser distinto por idioma. Efecto secundario: saltar de un idioma al otro recarga la página completa en vez de hacer una transición de cliente. Para un cambio de idioma es lo correcto — el documento entero es otro.
+
+**El `<select>` de usuarios manda el mismo valor en los dos idiomas** (`USER_RANGES` en `lib/content/index.ts`). Solo cambia la etiqueta que se lee. Si se tradujeran los valores, `/api/demo` los rechazaría y la hoja de Google quedaría partida en dos formatos.
+
+**Los legales en inglés son traducción de cortesía.** El aviso que obliga la LFPDPPP es el español y es el que prevalece; ambas páginas en inglés lo declaran de entrada y enlazan a la versión vinculante.
+
+**Los ids de sección no se traducen** (`#modulos`, `#precio`…). Un enlace profundo sirve en las dos versiones.
+
+Coste conocido: los componentes de cliente importan `getContent`, así que **los dos diccionarios viajan al navegador** — unos 8 kB. Si algún día pesa, la salida es pasarle a cada componente de cliente su porción de texto como prop desde el servidor.
 
 ---
 

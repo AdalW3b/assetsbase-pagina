@@ -14,6 +14,8 @@ import { NextResponse } from "next/server";
    Resend se llama con fetch a pelo, sin SDK: es una sola petición HTTP y no
    vale la pena arrastrar otra dependencia por ella. */
 
+import { DEFAULT_LANG, LANGS, routes, type Lang } from "@/lib/i18n";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -78,8 +80,52 @@ function quiereJson(request: Request) {
   return (request.headers.get("accept") ?? "").includes("application/json");
 }
 
+/* Los mensajes que ve el visitante, en su idioma. Viven aquí y no en
+   lib/content porque esto corre en el servidor y no debe arrastrar el
+   contenido entero de la landing a la ruta. */
+const MENSAJES = {
+  es: {
+    limite: "Demasiados intentos. Espera unos minutos o escríbenos por WhatsApp.",
+    invalida: "Solicitud inválida.",
+    campos: "Revisa los campos marcados.",
+    fallo: "No pudimos registrar tu solicitud.",
+  },
+  en: {
+    limite: "Too many attempts. Wait a few minutes or message us on WhatsApp.",
+    invalida: "Invalid request.",
+    campos: "Check the fields marked below.",
+    fallo: "We couldn't record your request.",
+  },
+} satisfies Record<Lang, Record<string, string>>;
+
+/* En qué idioma estaba el visitante.
+
+   El formulario manda un campo oculto `lang`. Cuando no llega —el límite de
+   intentos responde antes de leer el formulario, y una petición malformada
+   nunca lo produce— se cae al Referer, que en esos casos sí trae la ruta de
+   origen. El español es el último recurso: es el mercado primario. */
+function idiomaDe(request: Request, form?: FormData): Lang {
+  const declarado = form?.get("lang");
+  if (
+    typeof declarado === "string" &&
+    (LANGS as readonly string[]).includes(declarado)
+  ) {
+    return declarado as Lang;
+  }
+  try {
+    const referer = request.headers.get("referer");
+    if (referer && new URL(referer).pathname.startsWith(routes.home.en)) {
+      return "en";
+    }
+  } catch {
+    /* Referer ausente o no parseable: se queda con el idioma por defecto. */
+  }
+  return DEFAULT_LANG;
+}
+
 function responder(
   request: Request,
+  lang: Lang,
   cuerpo: Record<string, unknown>,
   status: number,
   cabeceras?: HeadersInit
@@ -87,7 +133,11 @@ function responder(
   if (quiereJson(request)) {
     return NextResponse.json(cuerpo, { status, headers: cabeceras });
   }
-  const destino = status >= 400 ? "/gracias?estado=error" : "/gracias";
+  /* Sin JS: se redirige a la página de gracias DEL IDIOMA en que se llenó
+     el formulario. Mandar a un anglohablante a /gracias es perderlo justo
+     en el momento en que ya había convertido. */
+  const base = routes.thanks[lang];
+  const destino = status >= 400 ? `${base}?estado=error` : base;
   return NextResponse.redirect(new URL(destino, request.url), {
     status: 303,
     headers: cabeceras,
@@ -184,12 +234,11 @@ async function entregarCorreo(lead: Lead, apiKey: string) {
 
 export async function POST(request: Request) {
   if (limiteExcedido(ipDe(request))) {
+    const lang = idiomaDe(request);
     return responder(
       request,
-      {
-        error:
-          "Demasiados intentos. Espera unos minutos o escríbenos por WhatsApp.",
-      },
+      lang,
+      { error: MENSAJES[lang].limite },
       429,
       { "retry-after": String(Math.ceil(VENTANA_MS / 1000)) }
     );
@@ -199,13 +248,16 @@ export async function POST(request: Request) {
   try {
     form = await request.formData();
   } catch {
-    return responder(request, { error: "Solicitud inválida." }, 400);
+    const lang = idiomaDe(request);
+    return responder(request, lang, { error: MENSAJES[lang].invalida }, 400);
   }
 
   /* Honeypot: los bots rellenan todos los campos, las personas no ven este.
      Se responde "ok" para que el bot no aprenda a esquivarlo. */
+  const lang = idiomaDe(request, form);
+
   if (limpiar(form.get("empresa_extra"), 200)) {
-    return responder(request, { ok: true }, 202);
+    return responder(request, lang, { ok: true }, 202);
   }
 
   const lead: Lead = {
@@ -228,7 +280,8 @@ export async function POST(request: Request) {
   if (campos.length) {
     return responder(
       request,
-      { error: "Revisa los campos marcados.", campos },
+      lang,
+      { error: MENSAJES[lang].campos, campos },
       422
     );
   }
@@ -241,11 +294,7 @@ export async function POST(request: Request) {
       "[demo] sin DEMO_WEBHOOK_URL ni RESEND_API_KEY: la solicitud NO se entregó.",
       JSON.stringify(lead)
     );
-    return responder(
-      request,
-      { error: "No pudimos registrar tu solicitud." },
-      503
-    );
+    return responder(request, lang, { error: MENSAJES[lang].fallo }, 503);
   }
 
   const intentos = await Promise.allSettled([
@@ -263,12 +312,8 @@ export async function POST(request: Request) {
     /* Último recurso: que el lead quede al menos en los logs del servidor,
        que son recuperables, en vez de perderse del todo. */
     console.error("[demo] NINGÚN canal entregó. Lead:", JSON.stringify(lead));
-    return responder(
-      request,
-      { error: "No pudimos registrar tu solicitud." },
-      502
-    );
+    return responder(request, lang, { error: MENSAJES[lang].fallo }, 502);
   }
 
-  return responder(request, { ok: true }, 200);
+  return responder(request, lang, { ok: true }, 200);
 }

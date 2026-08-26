@@ -1,16 +1,19 @@
 import { ImageResponse } from "next/og";
-import { ACTIVE_WEDGE, wedges } from "@/lib/content";
+import { ACTIVE_WEDGE, getContent } from "@/lib/content";
 import { MARK_LAYERS, MARK_STROKE, MARK_VIEWBOX } from "@/lib/mark";
+import type { Lang } from "@/lib/i18n";
 
 /* La tarjeta que se ve al compartir el enlace en WhatsApp, LinkedIn o Slack.
-   Antes no existía ninguna: el enlace salía como un rectángulo gris. */
+   Antes no existía ninguna: el enlace salía como un rectángulo gris.
 
-export const alt = "AssetBase ERP — el ERP para PyME en México";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+   Una por idioma — compartir la liga en inglés y que salga la tarjeta en
+   español desperdicia el único momento en que el enlace se ve solo. */
 
-export default function OpengraphImage() {
-  const { headline } = wedges[ACTIVE_WEDGE];
+export const ogSize = { width: 1200, height: 630 };
+
+export function ogCard(lang: Lang) {
+  const t = getContent(lang);
+  const { headline } = t.wedges[ACTIVE_WEDGE];
 
   return new ImageResponse(
     (
@@ -48,18 +51,14 @@ export default function OpengraphImage() {
             {headline}
           </div>
           <div style={{ fontSize: 30, color: "#96afaa", maxWidth: 900 }}>
-            Finanzas, inventario y nómina de tu PyME en un solo sistema.
+            {t.meta.ogImageSub}
           </div>
         </div>
 
         {/* Pastillas con borde en vez de separadores "·": satori colapsa los
             spans de un solo caracter y el texto se pega. */}
         <div style={{ display: "flex", gap: 14, fontSize: 22 }}>
-          {[
-            "Timbrado CFDI 4.0 incluido",
-            "Migración hecha por nosotros",
-            "En operación en 3 semanas",
-          ].map((chip) => (
+          {t.meta.ogImageChips.map((chip) => (
             <div
               key={chip}
               style={{
@@ -76,6 +75,6 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    size
+    ogSize
   );
 }

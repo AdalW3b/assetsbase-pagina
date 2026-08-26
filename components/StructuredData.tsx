@@ -1,10 +1,18 @@
-import { contact, faqs, plans } from "@/lib/content";
+import { contact, getContent } from "@/lib/content";
+import { htmlLang, routes, type Lang } from "@/lib/i18n";
 import { SITE } from "@/lib/site";
 
 /* Datos estructurados. Sin esto Google no tiene de dónde sacar el panel de
    la organización ni los desplegables de preguntas frecuentes en resultados
-   de búsqueda — y esta página vive de búsqueda. */
-export function StructuredData() {
+   de búsqueda — y esta página vive de búsqueda.
+
+   La Organization es la misma entidad en los dos idiomas y comparte @id: no
+   son dos empresas. Lo que cambia por idioma es el WebSite, la descripción
+   y las preguntas, porque son lo que se indexa por separado. */
+export function StructuredData({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+  const url = `${SITE}${routes.home[lang]}`.replace(/\/$/, "") || SITE;
+
   const grafo = {
     "@context": "https://schema.org",
     "@graph": [
@@ -18,18 +26,18 @@ export function StructuredData() {
         telephone: contact.phoneHref.replace("tel:", ""),
         address: {
           "@type": "PostalAddress",
-          addressLocality: contact.city,
+          addressLocality: t.contact.city,
           addressRegion: "CDMX",
           addressCountry: "MX",
         },
-        areaServed: { "@type": "Country", name: "México" },
+        areaServed: { "@type": "Country", name: t.meta.areaServed },
       },
       {
         "@type": "WebSite",
-        "@id": `${SITE}/#sitio`,
-        url: SITE,
+        "@id": `${url}/#sitio`,
+        url,
         name: "AssetBase ERP",
-        inLanguage: "es-MX",
+        inLanguage: htmlLang[lang],
         publisher: { "@id": `${SITE}/#organizacion` },
       },
       {
@@ -37,13 +45,12 @@ export function StructuredData() {
         name: "AssetBase ERP",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
-        inLanguage: "es-MX",
+        inLanguage: htmlLang[lang],
         publisher: { "@id": `${SITE}/#organizacion` },
-        description:
-          "Sistema ERP para PyME en México: finanzas, inventario, nómina y activos fijos en un solo sistema, con timbrado CFDI 4.0 nativo.",
+        description: t.meta.organizationDescription,
         /* Solo se publican los planes con precio real. Mientras `price`
            siga siendo "$X,XXX" no se emite una oferta con precio falso. */
-        offers: plans
+        offers: t.pricing.plans
           .filter((plan) => /\d/.test(plan.price))
           .map((plan) => ({
             "@type": "Offer",
@@ -55,8 +62,9 @@ export function StructuredData() {
       },
       {
         "@type": "FAQPage",
-        "@id": `${SITE}/#preguntas`,
-        mainEntity: faqs.map((item) => ({
+        "@id": `${url}/#preguntas`,
+        inLanguage: htmlLang[lang],
+        mainEntity: t.faq.items.map((item) => ({
           "@type": "Question",
           name: item.q,
           acceptedAnswer: { "@type": "Answer", text: item.a },

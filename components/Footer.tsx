@@ -1,9 +1,14 @@
 import Link from "next/link";
 import { Mark } from "./Mark";
 import { Year } from "./Year";
-import { contact, nav } from "@/lib/content";
+import { contact, getContent } from "@/lib/content";
+import { routes, type Lang } from "@/lib/i18n";
 
-export function Footer() {
+export function Footer({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+  const inicio = routes.home[lang];
+  const anclaInicio = inicio === "/" ? "" : inicio;
+
   return (
     <>
       <hr className="rule-fade" />
@@ -15,18 +20,21 @@ export function Footer() {
               AssetBase
             </span>
             <p className="mt-3.5 max-w-[30ch] text-[13.5px] leading-[1.7] text-ink-muted">
-              Maximizando el valor de tus activos desde la base.
+              {t.footer.tagline}
             </p>
           </div>
 
           <div>
             <h4 className="mb-3 text-[11px] tracking-[0.09em] text-ink-muted uppercase">
-              Producto
+              {t.footer.product}
             </h4>
             <ul className="flex flex-col gap-2.5">
-              {nav.map((item) => (
+              {t.nav.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-sm transition-colors hover:text-accent">
+                  <Link
+                    href={`${anclaInicio}${item.href}`}
+                    className="text-sm transition-colors hover:text-accent"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -36,7 +44,7 @@ export function Footer() {
 
           <div>
             <h4 className="mb-3 text-[11px] tracking-[0.09em] text-ink-muted uppercase">
-              Contacto
+              {t.footer.contact}
             </h4>
             <ul className="flex flex-col gap-2.5 text-sm">
               <li>
@@ -49,23 +57,23 @@ export function Footer() {
                   {contact.phone}
                 </a>
               </li>
-              <li className="text-ink-muted">{contact.city}</li>
+              <li className="text-ink-muted">{t.contact.city}</li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-3 text-[11px] tracking-[0.09em] text-ink-muted uppercase">
-              Legal
+              {t.footer.legal}
             </h4>
             <ul className="flex flex-col gap-2.5 text-sm">
               <li>
-                <Link href="/aviso-de-privacidad" className="transition-colors hover:text-accent">
-                  Aviso de privacidad
+                <Link href={routes.privacy[lang]} className="transition-colors hover:text-accent">
+                  {t.footer.privacy}
                 </Link>
               </li>
               <li>
-                <Link href="/terminos" className="transition-colors hover:text-accent">
-                  Términos de servicio
+                <Link href={routes.terms[lang]} className="transition-colors hover:text-accent">
+                  {t.footer.terms}
                 </Link>
               </li>
             </ul>
@@ -73,8 +81,8 @@ export function Footer() {
         </div>
 
         <p className="mt-9 border-t border-hairline pt-5 text-[12.5px] leading-[1.68] text-ink-muted">
-          © <Year fallback={new Date().getFullYear()} /> AssetBase ERP.
-          Todos los derechos reservados.
+          © <Year fallback={new Date().getFullYear()} /> AssetBase ERP.{" "}
+          {t.footer.rights}
         </p>
       </footer>
     </>

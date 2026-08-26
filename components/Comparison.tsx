@@ -1,21 +1,22 @@
-import { comparison } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
 import { Kicker, Reveal } from "./Reveal";
 
 /* Comparison is doing the buyer's homework for them — the strongest move
    available to an unknown brand. Keep the competitor column HONEST:
    overstating it is the fastest way to lose the deal you just won. */
-export function Comparison() {
+export function Comparison({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+
   return (
     <section id="comparativa" className="pt-16 pb-5 sm:pt-24">
       <Reveal>
-        <Kicker>Comparativa</Kicker>
+        <Kicker>{t.comparison.kicker}</Kicker>
         <h2 className="max-w-[24ch] text-[clamp(1.7rem,3vw,2.5rem)] leading-[1.15]">
-          Ya estás comparando. Te ahorramos la tarde.
+          {t.comparison.heading}
         </h2>
         <p className="mt-5.5 max-w-[56ch] text-[16.5px] leading-[1.7] text-ink/80">
-          Odoo es un buen producto y a veces es la respuesta correcta. Esto es
-          lo que cambia para una PyME mexicana que necesita operar el mes que
-          entra.
+          {t.comparison.lead}
         </p>
       </Reveal>
 
@@ -23,19 +24,17 @@ export function Comparison() {
         <div
           tabIndex={0}
           role="region"
-          aria-label="Tabla comparativa"
+          aria-label={t.comparison.tableAria}
           className="mt-10 overflow-x-auto rounded-lg bg-surface p-3 ring-1 ring-hairline sm:p-6"
         >
           <table className="w-full min-w-[640px] border-collapse text-sm">
-            <caption className="sr-only">
-              AssetBase comparado con Odoo y con llevar la operación en Excel
-            </caption>
+            <caption className="sr-only">{t.comparison.tableCaption}</caption>
             <thead>
               <tr className="border-b border-hairline">
                 <th scope="col" className="w-[26%] p-2 text-left text-[11px] font-normal tracking-[0.08em] text-ink-muted uppercase">
-                  <span className="sr-only">Criterio</span>
+                  <span className="sr-only">{t.comparison.criterion}</span>
                 </th>
-                {comparison.columns.map((col, i) => (
+                {t.comparison.columns.map((col, i) => (
                   <th
                     key={col}
                     scope="col"
@@ -49,7 +48,7 @@ export function Comparison() {
               </tr>
             </thead>
             <tbody>
-              {comparison.rows.map((row) => (
+              {t.comparison.rows.map((row) => (
                 <tr key={row.feature} className="border-b border-white/8 last:border-0">
                   <th scope="row" className="p-2 text-left align-top font-semibold">
                     {row.feature}
@@ -68,9 +67,7 @@ export function Comparison() {
           </table>
         </div>
         <p className="mt-4 text-[13px] leading-[1.7] text-ink-muted">
-          Si tu operación necesita manufactura por lotes, comercio exterior o
-          varias monedas, te lo decimos en el diagnóstico y te sugerimos la
-          alternativa. Preferimos no venderte que dejarte a medias.
+          {t.comparison.note}
         </p>
       </Reveal>
     </section>

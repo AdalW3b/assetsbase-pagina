@@ -3,30 +3,32 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
-import { faqs } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
 import { Kicker } from "./Reveal";
 
-export function Faq() {
+export function Faq({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <section id="preguntas" className="pt-16 pb-5 sm:pt-24">
       <div className="grid items-start gap-7 lg:grid-cols-[4fr_8fr] lg:gap-18">
         <div>
-          <Kicker>Preguntas</Kicker>
+          <Kicker>{t.faq.kicker}</Kicker>
           <h2 className="max-w-[16ch] text-[clamp(1.55rem,2.8vw,2.125rem)] leading-[1.2]">
-            Lo que se pregunta antes de firmar
+            {t.faq.heading}
           </h2>
         </div>
 
         <div className="max-w-[64ch]">
-          {faqs.map((item, i) => {
+          {t.faq.items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div
                 key={item.q}
                 className={`border-t border-hairline ${
-                  i === faqs.length - 1 ? "border-b" : ""
+                  i === t.faq.items.length - 1 ? "border-b" : ""
                 }`}
               >
                 <button

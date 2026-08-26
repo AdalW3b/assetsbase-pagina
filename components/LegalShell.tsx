@@ -1,22 +1,33 @@
 import type { ReactNode } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { getContent } from "@/lib/content";
+import type { Lang, RouteKey } from "@/lib/i18n";
 
 /* Envoltura de las páginas legales: mismo header y footer que la landing,
    con una columna de lectura estrecha y estilos de prosa locales — el
-   proyecto no usa el plugin de tipografía. */
+   proyecto no usa el plugin de tipografía.
+
+   `routeKey` es lo que le permite al botón de idioma saltar a la MISMA
+   página legal en el otro idioma, en vez de mandar al inicio. */
 export function LegalShell({
+  lang,
+  routeKey,
   title,
   updated,
   children,
 }: {
+  lang: Lang;
+  routeKey: RouteKey;
   title: string;
   updated: string;
   children: ReactNode;
 }) {
+  const t = getContent(lang);
+
   return (
     <>
-      <Header />
+      <Header lang={lang} routeKey={routeKey} />
       <main>
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-16">
           <article className="max-w-[68ch] pt-14 pb-16 sm:pt-20">
@@ -24,7 +35,7 @@ export function LegalShell({
               {title}
             </h1>
             <p className="mt-4 text-[13px] tracking-[0.05em] text-ink-muted uppercase">
-              Última actualización: {updated}
+              {t.legal.updated} {updated}
             </p>
 
             <div
@@ -34,7 +45,7 @@ export function LegalShell({
             </div>
           </article>
 
-          <Footer />
+          <Footer lang={lang} />
         </div>
       </main>
     </>

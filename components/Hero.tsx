@@ -3,10 +3,12 @@ import { MessageCircle } from "lucide-react";
 import { HeroBackdrop } from "./HeroBackdrop";
 import { Reveal } from "./Reveal";
 import { Mark } from "./Mark";
-import { ACTIVE_WEDGE, contact, heroChips, wedges } from "@/lib/content";
+import { ACTIVE_WEDGE, contact, getContent } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
 
-export function Hero() {
-  const { headline, sub } = wedges[ACTIVE_WEDGE];
+export function Hero({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+  const { headline, sub } = t.wedges[ACTIVE_WEDGE];
 
   return (
     <section
@@ -31,7 +33,7 @@ export function Hero() {
               href="#demo"
               className="rounded-lg border border-accent px-5.5 py-3 text-[15px] text-accent transition-colors hover:bg-accent/12 active:bg-accent/22"
             >
-              Agenda una demo de 20 minutos
+              {t.hero.ctaPrimary}
             </a>
             <a
               href={contact.whatsapp}
@@ -40,14 +42,14 @@ export function Hero() {
               className="flex items-center gap-2 rounded-lg px-4 py-3 text-[15px] text-accent transition-colors hover:bg-accent/10 active:bg-accent/18"
             >
               <MessageCircle size={17} aria-hidden="true" />
-              O escríbenos por WhatsApp
+              {t.hero.ctaWhatsapp}
             </a>
           </div>
         </Reveal>
 
         <Reveal delay={0.16}>
           <ul className="mt-6.5 flex flex-wrap gap-2.5">
-            {heroChips.map((chip) => (
+            {t.hero.chips.map((chip) => (
               <li
                 key={chip}
                 className="rounded-full bg-surface px-3 py-1.5 text-[13px] ring-1 ring-hairline"
@@ -65,17 +67,17 @@ export function Hero() {
             <div className="flex items-center gap-2.5 border-b border-hairline px-3.5 py-2.5">
               <Mark className="h-4 w-auto" />
               <span className="text-[12.5px] text-ink-muted">
-                Panel de dirección · Agosto
+                {t.hero.panelLabel}
               </span>
               <span className="ml-auto text-[11px] tracking-[0.06em] text-accent uppercase">
-                En vivo
+                {t.hero.panelLive}
               </span>
             </div>
             {/* Swap for a real product capture: public/producto-panel.png */}
             <div className="relative aspect-16/11 w-full bg-recess">
               <Image
                 src="/producto-panel.png"
-                alt="Panel principal de AssetBase con los indicadores del mes"
+                alt={t.hero.panelAlt}
                 fill
                 sizes="(max-width: 1024px) 100vw, 600px"
                 className="object-cover"
@@ -84,8 +86,7 @@ export function Hero() {
             </div>
           </div>
           <figcaption className="mt-3 text-[12.5px] text-ink-muted">
-            Cifras reales, actualizadas en el momento en que se registra el
-            movimiento.
+            {t.hero.caption}
           </figcaption>
         </figure>
       </Reveal>

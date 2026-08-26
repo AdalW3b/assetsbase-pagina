@@ -1,20 +1,25 @@
 import Image from "next/image";
-import { painPoints, implementation, modules } from "@/lib/content";
+import { getContent, painIcons } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
 import { Kicker, Reveal } from "./Reveal";
 
-export function PainPoints() {
+export function PainPoints({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+
   return (
     <section className="pt-16 pb-5 sm:pt-24">
       <Reveal>
-        <Kicker>El costo de no cambiar</Kicker>
+        <Kicker>{t.pain.kicker}</Kicker>
         <h2 className="max-w-[22ch] text-[clamp(1.7rem,3vw,2.5rem)] leading-[1.15]">
-          Nadie compra un ERP. Se compra dejar de perder dinero en lo mismo.
+          {t.pain.heading}
         </h2>
       </Reveal>
 
       <div className="mt-11 grid gap-4 sm:grid-cols-2">
-        {painPoints.map((item, i) => {
-          const Icon = item.icon;
+        {t.pain.items.map((item, i) => {
+          /* Los iconos van por posición, no por idioma: viven en
+             lib/content/index.ts junto al resto de lo que no es texto. */
+          const Icon = painIcons[i];
           return (
             <Reveal key={item.title} delay={i * 0.06}>
               <article className="h-full rounded-lg bg-surface p-6 ring-1 ring-hairline transition-all duration-200 hover:-translate-y-0.5 hover:ring-boston-600 [--color-accent:var(--color-accent-on-surface)]">
@@ -30,31 +35,31 @@ export function PainPoints() {
   );
 }
 
-export function Implementation() {
+export function Implementation({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+
   return (
     <section id="implementacion" className="pt-16 pb-5 sm:pt-24">
       <div className="grid items-start gap-7 lg:grid-cols-2 lg:gap-16">
         <Reveal>
-          <Kicker>Implementación</Kicker>
+          <Kicker>{t.implementation.kicker}</Kicker>
           <h2 className="max-w-[22ch] text-[clamp(1.7rem,3vw,2.5rem)] leading-[1.15]">
-            Tres semanas, tres pasos, un responsable con nombre.
+            {t.implementation.heading}
           </h2>
         </Reveal>
         <Reveal delay={0.08}>
           <p className="max-w-[50ch] pt-1.5 text-[16.5px] leading-[1.7] text-ink/80">
-            El riesgo de un ERP no es el precio, es quedarse a medias. Por eso la
-            implementación no se cotiza aparte: es el producto. Firmas un plan
-            con fechas, no una promesa.
+            {t.implementation.lead}
           </p>
         </Reveal>
       </div>
 
       <div className="mt-13">
-        {implementation.map((step, i) => (
+        {t.implementation.steps.map((step, i) => (
           <Reveal key={step.week} delay={i * 0.06}>
             <div
               className={`grid items-baseline gap-x-6 gap-y-3 rounded-lg border-t border-hairline px-2 py-7.5 transition-colors hover:bg-surface hover:[--color-accent:var(--color-accent-on-surface)] lg:grid-cols-[110px_minmax(0,260px)_minmax(0,1fr)] lg:gap-x-15 lg:px-4.5 ${
-                i === implementation.length - 1 ? "border-b" : ""
+                i === t.implementation.steps.length - 1 ? "border-b" : ""
               }`}
             >
               <p className="font-heading m-0 text-sm leading-6 tracking-[0.05em] text-accent uppercase transition-colors tabular-nums">
@@ -72,28 +77,28 @@ export function Implementation() {
   );
 }
 
-export function Modules() {
+export function Modules({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+
   return (
     <section id="modulos" className="pt-16 pb-5 sm:pt-24">
       <Reveal>
-        <Kicker>Módulos</Kicker>
+        <Kicker>{t.modules.kicker}</Kicker>
       </Reveal>
 
       <div className="grid items-center gap-7 lg:grid-cols-2 lg:gap-18">
         <Reveal>
           <h2 className="max-w-[20ch] text-[clamp(1.7rem,3vw,2.5rem)] leading-[1.15]">
-            Un solo lugar donde el número es el número.
+            {t.modules.heading}
           </h2>
           <p className="mt-5.5 max-w-[46ch] text-[16.5px] leading-[1.7] text-ink/80">
-            Los módulos comparten la misma base de datos, así que una venta
-            descuenta inventario, genera la factura timbrada y aparece en el
-            estado de resultados sin que nadie capture nada dos veces.
+            {t.modules.lead}
           </p>
           <a
             href="#demo"
             className="mt-6 inline-block border-b border-accent/40 pb-0.5 text-[15.5px] text-accent transition-colors hover:border-accent"
           >
-            Ver el sistema en una demo →
+            {t.modules.cta}
           </a>
         </Reveal>
 
@@ -103,7 +108,7 @@ export function Modules() {
             <div className="relative aspect-16/10 w-full bg-recess">
               <Image
                 src="/producto-reporte.png"
-                alt="Reporte de inventario y ventas generado por AssetBase"
+                alt={t.modules.figureAlt}
                 fill
                 sizes="(max-width: 1024px) 100vw, 600px"
                 className="object-cover"
@@ -114,11 +119,11 @@ export function Modules() {
       </div>
 
       <div className="mt-14">
-        {modules.map((mod, i) => (
+        {t.modules.items.map((mod, i) => (
           <Reveal key={mod.n} delay={i * 0.05}>
             <div
               className={`grid items-baseline gap-x-6 gap-y-3 rounded-lg border-t border-hairline px-2 py-7 transition-colors hover:bg-surface hover:[--color-accent:var(--color-accent-on-surface)] lg:grid-cols-[78px_minmax(0,250px)_minmax(0,1fr)] lg:gap-x-15 lg:px-4.5 ${
-                i === modules.length - 1 ? "border-b" : ""
+                i === t.modules.items.length - 1 ? "border-b" : ""
               }`}
             >
               <p className="font-heading m-0 text-[15px] leading-6.5 text-accent transition-colors tabular-nums">

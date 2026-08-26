@@ -1,63 +1,58 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { contact } from "@/lib/content";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import { contact, getContent } from "@/lib/content";
+import { routes, type Lang } from "@/lib/i18n";
 
 /* Destino del formulario cuando el visitante NO tiene JavaScript.
 
    Con JS, DemoForm intercepta el envío y pinta la confirmación sin salir
    de la página; nadie llega aquí. Sin JS el navegador hace un POST nativo
    a /api/demo, y hasta ahora esa ruta contestaba JSON: el visitante veía
-   {"ok":true} sobre fondo blanco. Ahora la ruta redirige (303) hacia acá.
+   {"ok":true} sobre fondo blanco. Ahora la ruta redirige (303) hacia acá,
+   a la versión del idioma en el que se llenó el formulario.
 
    El estado viaja en la query porque un 303 no lleva cuerpo. */
-
-export const metadata: Metadata = {
-  title: "Gracias",
-  robots: { index: false, follow: false },
-};
-
-export default async function Gracias({
-  searchParams,
+export function ThanksPage({
+  lang,
+  estado,
 }: {
-  searchParams: Promise<{ estado?: string }>;
+  lang: Lang;
+  estado?: string;
 }) {
-  const { estado } = await searchParams;
+  const t = getContent(lang);
   const falló = estado === "error";
 
   return (
     <>
-      <Header />
+      <Header lang={lang} routeKey="thanks" />
       <main>
         <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-16">
           <section className="max-w-[54ch] pt-20 pb-16 sm:pt-28 sm:pb-24">
             {falló ? (
               <>
                 <p className="font-heading text-[13px] tracking-[0.08em] text-accent uppercase">
-                  No se registró
+                  {t.thanks.errorEyebrow}
                 </p>
                 <h1 className="mt-5 text-[clamp(1.9rem,3.4vw,2.75rem)] leading-[1.14]">
-                  No pudimos registrar tu solicitud.
+                  {t.thanks.errorHeading}
                 </h1>
                 <p className="mt-5 text-[16.5px] leading-[1.7] text-ink/80">
-                  Algo falló de nuestro lado, así que tu demo <strong>no</strong>{" "}
-                  quedó agendada. No queremos que te vayas creyendo que sí:
-                  escríbenos y lo resolvemos en el momento.
+                  {t.thanks.errorBodyStart}{" "}
+                  <strong>{t.thanks.errorBodyStrong}</strong>{" "}
+                  {t.thanks.errorBodyEnd}
                 </p>
               </>
             ) : (
               <>
                 <p className="font-heading text-[13px] tracking-[0.08em] text-accent uppercase">
-                  Solicitud recibida
+                  {t.thanks.okEyebrow}
                 </p>
                 <h1 className="mt-5 text-[clamp(1.9rem,3.4vw,2.75rem)] leading-[1.14]">
-                  Listo, te confirmamos hoy mismo.
+                  {t.thanks.okHeading}
                 </h1>
                 <p className="mt-5 text-[16.5px] leading-[1.7] text-ink/80">
-                  Revisa tu correo en las próximas horas: ahí llega el horario
-                  y la liga de la sesión. Si prefieres adelantarlo, escríbenos
-                  por WhatsApp y lo agendamos ahora mismo.
+                  {t.thanks.okBody}
                 </p>
               </>
             )}
@@ -69,7 +64,7 @@ export default async function Gracias({
                 rel="noopener noreferrer"
                 className="rounded-lg border border-accent px-5 py-3 text-[15px] text-accent transition-colors hover:bg-accent/12 active:bg-accent/22"
               >
-                Escribir por WhatsApp
+                {t.thanks.ctaWhatsapp}
               </a>
               <a
                 href={`mailto:${contact.email}`}
@@ -80,13 +75,16 @@ export default async function Gracias({
             </div>
 
             <p className="mt-7 text-[14.5px] leading-[1.7] text-ink-muted">
-              <Link href="/" className="border-b border-white/25 transition-colors hover:text-accent">
-                Volver al inicio
+              <Link
+                href={routes.home[lang]}
+                className="border-b border-white/25 transition-colors hover:text-accent"
+              >
+                {t.thanks.back}
               </Link>
             </p>
           </section>
 
-          <Footer />
+          <Footer lang={lang} />
         </div>
       </main>
     </>

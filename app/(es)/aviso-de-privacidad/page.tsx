@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalShell } from "@/components/LegalShell";
-import { contact } from "@/lib/content";
+import { alternatesFor } from "@/lib/metadata";
+import { contact, getContent } from "@/lib/content";
 
 /* PLANTILLA — revisar con abogado antes de publicar.
    La LFPDPPP obliga a un aviso de privacidad porque el formulario de demo
@@ -11,12 +12,15 @@ export const metadata: Metadata = {
   title: "Aviso de privacidad",
   description:
     "Cómo AssetBase ERP recaba, usa y protege tus datos personales conforme a la LFPDPPP.",
+  alternates: alternatesFor("privacy", "es"),
   robots: { index: true, follow: false },
 };
 
 export default function AvisoDePrivacidad() {
+  const t = getContent("es");
+
   return (
-    <LegalShell title="Aviso de privacidad" updated="21 de agosto de 2026">
+    <LegalShell lang="es" routeKey="privacy" title="Aviso de privacidad" updated="21 de agosto de 2026">
       <p>
         En cumplimiento de la Ley Federal de Protección de Datos Personales en
         Posesión de los Particulares (LFPDPPP), su Reglamento y los
@@ -26,7 +30,7 @@ export default function AvisoDePrivacidad() {
 
       <h2>Responsable del tratamiento</h2>
       <p>
-        AssetBase ERP, con domicilio en {contact.city}, es responsable del
+        AssetBase ERP, con domicilio en {t.contact.city}, es responsable del
         tratamiento de los datos personales que nos proporciones. Para
         cualquier asunto relacionado con este aviso puedes escribir a{" "}
         <a href={`mailto:${contact.email}`}>{contact.email}</a>.

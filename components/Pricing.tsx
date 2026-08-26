@@ -1,23 +1,24 @@
-import { plans } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import type { Lang } from "@/lib/i18n";
 import { Kicker, Reveal } from "./Reveal";
 
-export function Pricing() {
+export function Pricing({ lang }: { lang: Lang }) {
+  const t = getContent(lang);
+
   return (
     <section id="precio" className="pt-16 pb-5 sm:pt-24">
       <Reveal>
-        <Kicker>Precio</Kicker>
+        <Kicker>{t.pricing.kicker}</Kicker>
         <h2 className="max-w-[24ch] text-[clamp(1.7rem,3vw,2.5rem)] leading-[1.15]">
-          Precio publicado. Sin «solicitar cotización».
+          {t.pricing.heading}
         </h2>
         <p className="mt-5.5 max-w-[50ch] text-[16.5px] leading-[1.7] text-ink/80">
-          Si tienes que llamar para saber cuánto cuesta, ya perdiste una tarde.
-          La implementación de tres semanas va incluida en los dos primeros
-          planes.
+          {t.pricing.lead}
         </p>
       </Reveal>
 
       <div className="mt-11 grid items-start gap-4 lg:grid-cols-3">
-        {plans.map((plan, i) => (
+        {t.pricing.plans.map((plan, i) => (
           <Reveal key={plan.name} delay={i * 0.07}>
             <article
               className={`flex h-full flex-col rounded-lg bg-surface p-6.5 transition-all duration-200 hover:-translate-y-0.5 [--color-accent:var(--color-accent-on-surface)] ${
@@ -62,8 +63,7 @@ export function Pricing() {
       </div>
 
       <p className="mt-4.5 text-[13px] leading-[1.7] text-ink-muted">
-        Tus datos son tuyos. Exportación completa en cualquier momento, sin
-        costo y sin plazo forzoso.
+        {t.pricing.note}
       </p>
     </section>
   );

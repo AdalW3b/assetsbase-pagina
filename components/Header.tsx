@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Mark } from "./Mark";
-import { nav } from "@/lib/content";
+import { LanguageToggle } from "./LanguageToggle";
+import { getContent } from "@/lib/content";
+import { routes, type Lang, type RouteKey } from "@/lib/i18n";
 
 /* Header sticky.
 
@@ -15,10 +17,26 @@ import { nav } from "@/lib/content";
    scroll-padding-top de 5rem quedaba corto y las anclas caían debajo de él.
 
    A partir de `lg` cabe la fila completa; por debajo va menú desplegable y
-   el header conserva su altura fija de 64px. */
-export function Header() {
+   el header conserva su altura fija de 64px.
+
+   El botón de idioma queda FUERA del menú desplegable a propósito: cambiar
+   de idioma no debería costar dos toques ni obligar a descubrir un menú. */
+export function Header({
+  lang,
+  routeKey,
+}: {
+  lang: Lang;
+  routeKey: RouteKey;
+}) {
+  const t = getContent(lang);
   const [lifted, setLifted] = useState(false);
   const [abierto, setAbierto] = useState(false);
+
+  /* Las anclas del menú son ids de sección compartidos entre idiomas, así
+     que hay que anteponerles la raíz del idioma: desde /en/privacy, un
+     "#modulos" pelado apuntaría a esa misma página legal. */
+  const inicio = routes.home[lang];
+  const anclaInicio = inicio === "/" ? "" : inicio;
 
   useEffect(() => {
     const onScroll = () => setLifted(window.scrollY > 8);
@@ -49,10 +67,10 @@ export function Header() {
       }`}
     >
       <nav className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-16">
-        <div className="flex min-h-16 items-center gap-x-6 py-2.5">
+        <div className="flex min-h-16 items-center gap-x-3 py-2.5 lg:gap-x-6">
           <Link
-            href="/"
-            aria-label="AssetBase — inicio"
+            href={inicio}
+            aria-label={t.header.home}
             onClick={() => setAbierto(false)}
             className="font-heading mr-auto flex flex-none items-center gap-2.5 text-lg lg:mr-5"
           >
@@ -61,10 +79,10 @@ export function Header() {
           </Link>
 
           <div className="mr-auto hidden min-w-0 shrink items-center gap-x-6 lg:flex">
-            {nav.map((item) => (
+            {t.nav.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={`${anclaInicio}${item.href}`}
                 className="text-[14.5px] whitespace-nowrap text-ink-muted transition-colors hover:text-accent"
               >
                 {item.label}
@@ -72,11 +90,13 @@ export function Header() {
             ))}
           </div>
 
+          <LanguageToggle lang={lang} routeKey={routeKey} />
+
           <Link
-            href="/#demo"
+            href={`${anclaInicio}#demo`}
             className="hidden flex-none rounded-lg border border-accent px-4 py-2 text-[14.5px] whitespace-nowrap text-accent transition-colors hover:bg-accent/12 active:bg-accent/22 lg:block"
           >
-            Agenda una demo
+            {t.header.cta}
           </Link>
 
           <button
@@ -86,7 +106,9 @@ export function Header() {
             onClick={() => setAbierto((v) => !v)}
             className="grid size-10 flex-none place-items-center rounded-lg border border-white/16 text-ink transition-colors hover:border-white/40 lg:hidden"
           >
-            <span className="sr-only">{abierto ? "Cerrar menú" : "Abrir menú"}</span>
+            <span className="sr-only">
+              {abierto ? t.header.closeMenu : t.header.openMenu}
+            </span>
             {abierto ? <X size={19} aria-hidden="true" /> : <Menu size={19} aria-hidden="true" />}
           </button>
         </div>
@@ -100,10 +122,10 @@ export function Header() {
           }`}
         >
           <ul className="flex flex-col py-2">
-            {nav.map((item) => (
+            {t.nav.map((item) => (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={`${anclaInicio}${item.href}`}
                   onClick={() => setAbierto(false)}
                   className="block py-3 text-[15px] text-ink-muted transition-colors hover:text-accent"
                 >
@@ -113,11 +135,11 @@ export function Header() {
             ))}
           </ul>
           <Link
-            href="/#demo"
+            href={`${anclaInicio}#demo`}
             onClick={() => setAbierto(false)}
             className="mt-1 mb-4 block rounded-lg border border-accent px-4 py-2.5 text-center text-[15px] text-accent transition-colors hover:bg-accent/12 active:bg-accent/22"
           >
-            Agenda una demo
+            {t.header.cta}
           </Link>
         </div>
       </nav>
