@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   AssetBase — design tokens
+   Colors taken verbatim from the Manual de identidad corporativa
+   (pág. 19, "Colorimetria"): Boston Blue (primario),
+   Cascade (secundario), Mercury (neutros).
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  /* Primary — Boston Blue */
+  --color-boston-50: #d5f1fb;
+  --color-boston-100: #b1e2f0;
+  --color-boston-200: #7bcee5;
+  --color-boston-300: #2290b5; /* el azul del logotipo */
+  --color-boston-400: #45a0e6; /* el acento: el azul que da presencia */
+  --color-boston-500: #3882bb;
+  --color-boston-600: #2e6b99;
+  --color-boston-700: #245377;
+  --color-boston-800: #193b55;
+  --color-boston-900: #283a48; /* el navy del logotipo */
+  --color-boston-950: #102a3c;
+
+  /* Secondary — Cascade */
+  --color-cascade-50: #f5fbf7;
+  --color-cascade-100: #dfebe6;
+  --color-cascade-200: #bfd0cc;
+  --color-cascade-300: #96afaa;
+  --color-cascade-400: #728f8a;
+  --color-cascade-500: #5b7470;
+  --color-cascade-600: #455c59;
+  --color-cascade-700: #394c49;
+  --color-cascade-800: #313e3c;
+  --color-cascade-900: #283635;
+  --color-cascade-950: #161d1d;
+
+  /* Neutral — Mercury */
+  --color-mercury-50: #fbfbfb;
+  --color-mercury-100: #ebebeb;
+  --color-mercury-200: #dcdcdc;
+  --color-mercury-300: #bdbdbd;
+  --color-mercury-400: #989898;
+  --color-mercury-500: #7c7c7c;
+  --color-mercury-600: #656565;
+  --color-mercury-700: #525252;
+  --color-mercury-800: #464646;
+  --color-mercury-900: #3d3d3d;
+  --color-mercury-950: #292929;
+
+  /* Semantic roles — the dark direction.
+     accent is tuned against the page ground (boston-950). On the lighter
+     boston-800 panels use accent-on-surface (boston-200) for TEXT and keep
+     boston-400 for 1px outlines and marks — boston-400 only reaches 4.1:1
+     on boston-800, which is under AA for body sizes. */
+  --color-ground: var(--color-boston-950);
+  --color-surface: var(--color-boston-800);
+  --color-recess: var(--color-boston-950);
+  --color-band: var(--color-boston-700);
+  --color-hairline: var(--color-boston-700);
+  --color-ink: var(--color-cascade-50);
+  --color-ink-muted: var(--color-cascade-300);
+  --color-accent: var(--color-boston-400);
+  --color-accent-on-surface: var(--color-boston-200);
+
+  --font-heading: var(--font-reem-kufi), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-raleway), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-drift-a: drift-a 22s ease-in-out infinite;
+  --animate-drift-b: drift-b 27s ease-in-out infinite;
+  --animate-drift-c: drift-c 19s ease-in-out infinite;
+  --animate-grid: grid-pan 9s linear infinite;
+  --animate-scan: scan 14s linear infinite;
+  --animate-halo: halo 2.6s ease-in-out infinite;
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(7%, 9%, 0) scale(1.18); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.06); }
+  50% { transform: translate3d(-9%, -6%, 0) scale(0.9); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.95); }
+  50% { transform: translate3d(5%, -10%, 0) scale(1.2); }
+}
+@keyframes grid-pan {
+  0% { background-position: 0 0; }
+  100% { background-position: 30px 30px; }
+}
+@keyframes scan {
+  0% { transform: translateY(-8%); opacity: 0; }
+  40% { opacity: 0.55; }
+  100% { transform: translateY(108%); opacity: 0; }
+}
+@keyframes halo {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.12); }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* the sticky header is 65px — keep anchored sections clear of it */
+    scroll-padding-top: 5rem;
+  }
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    text-wrap: pretty;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Section separators fade at their ends rather than stopping cleanly. */
+@utility rule-fade {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-ink) 16%, transparent) 48px,
+    color-mix(in srgb, var(--color-ink) 16%, transparent) calc(100% - 48px),
+    transparent
+  );
+}

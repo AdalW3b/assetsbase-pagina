@@ -1,0 +1,36 @@
+/* Los cuatro trazos del imagotipo (las capas hexagonales de la "versión
+   secundaria" del manual: símbolo, sin wordmark), en un solo lugar.
+
+   Antes estaban copiados en Mark.tsx, opengraph-image.tsx y apple-icon.tsx:
+   cualquier ajuste al logo obligaba a tocar tres archivos y a acordarse del
+   cuarto. `app/icon.svg` es un archivo estático y no puede importar de aquí
+   — si el trazo cambia, ese sí se actualiza a mano. */
+
+export const MARK_VIEWBOX = "178 2 220 265";
+
+/* El azul del acento, en literal, para los contextos que no tienen CSS:
+   satori (ImageResponse) no resuelve var(--color-accent). */
+export const MARK_STROKE = "#45a0e6";
+
+export const MARK_LAYERS = [
+  {
+    d: "M388 109.651L293.753 70.512C290.07 68.9826 285.93 68.9826 282.247 70.512L188 109.651V56.541C188 50.4791 191.649 45.013 197.247 42.6881L282.247 7.38909C285.93 5.8597 290.07 5.8597 293.753 7.38909L378.753 42.6881C384.351 45.013 388 50.4791 388 56.541V109.651Z",
+    fill: "#283A48",
+    stroke: true,
+  },
+  {
+    d: "M228 100.93L255.711 89.2893C260.049 87.4668 264.992 87.7859 269.06 90.1511L280.061 96.547C284.722 99.2568 290.478 99.2568 295.139 96.547L312.6 86.3954L349.2 100.93L294.554 128.929C290.196 131.162 285.022 131.127 280.695 128.835L228 100.93Z",
+    fill: "#2290B5",
+    stroke: false,
+  },
+  {
+    d: "M188 113.238C188 101.684 200.514 94.4679 210.514 100.255L280.487 140.751C285.134 143.441 290.866 143.441 295.514 140.751L365.487 100.255C375.487 94.4679 388 101.684 388 113.238V128.674C388 134.027 385.147 138.975 380.514 141.656L295.514 190.851C290.866 193.541 285.134 193.541 280.486 190.851L195.486 141.656C190.853 138.975 188 134.027 188 128.674V113.238Z",
+    fill: "#2290B5",
+    stroke: false,
+  },
+  {
+    d: "M188 150.495C188 148.954 189.668 147.992 191.002 148.764L280.487 200.552C285.134 203.242 290.866 203.242 295.514 200.552L384.998 148.764C386.332 147.992 388 148.954 388 150.495V188.474C388 193.828 385.147 198.775 380.514 201.457L295.514 250.651C290.866 253.341 285.134 253.341 280.486 250.651L195.486 201.457C190.853 198.775 188 193.828 188 188.474V150.495Z",
+    fill: "#2290B5",
+    stroke: false,
+  },
+] as const;
